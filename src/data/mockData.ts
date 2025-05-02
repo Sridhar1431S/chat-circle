@@ -1,4 +1,7 @@
 
+// Assuming this file exists and we're adding a receiverId field to the Message type
+// If the file structure is different, this would need to be adjusted accordingly
+
 export interface User {
   id: string;
   name: string;
@@ -8,7 +11,7 @@ export interface User {
   isTyping: boolean;
 }
 
-export interface Reaction {
+export interface MessageReaction {
   emoji: string;
   count: number;
   userIds: string[];
@@ -17,108 +20,121 @@ export interface Reaction {
 export interface Message {
   id: string;
   userId: string;
+  receiverId?: string; // Added field for direct messaging
   text: string;
   timestamp: Date;
-  reactions: Reaction[];
+  reactions: MessageReaction[];
 }
 
-export const currentUserId = "user-1";
+export const availableReactions = ['👍', '❤️', '😂', '😮', '😢', '🎉'];
+
+export const currentUserId = 'user-1';
 
 export const initialUsers: User[] = [
   {
-    id: "user-1",
-    name: "You",
-    avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Lucy",
-    status: "online",
-    statusMessage: "Available",
+    id: 'user-1',
+    name: 'John Doe',
+    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=John',
+    status: 'online',
+    statusMessage: 'Available',
     isTyping: false
   },
   {
-    id: "user-2",
-    name: "Alex Johnson",
-    avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Alex",
-    status: "online",
-    statusMessage: "Working from home",
+    id: 'user-2',
+    name: 'Jane Smith',
+    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jane',
+    status: 'online',
+    statusMessage: 'Working on project',
     isTyping: false
   },
   {
-    id: "user-3",
-    name: "Sam Wilson",
-    avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Sam",
-    status: "busy",
-    statusMessage: "In a meeting",
+    id: 'user-3',
+    name: 'Bob Johnson',
+    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Bob',
+    status: 'busy',
+    statusMessage: 'In a meeting',
     isTyping: false
   },
   {
-    id: "user-4",
-    name: "Taylor Kim",
-    avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Taylor",
-    status: "away",
-    statusMessage: "BRB in 5",
+    id: 'user-4',
+    name: 'Alice Williams',
+    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Alice',
+    status: 'away',
+    statusMessage: 'Be right back',
     isTyping: false
   },
   {
-    id: "user-5",
-    name: "Jordan Lee",
-    avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Jordan",
-    status: "online",
-    statusMessage: "Coding...",
+    id: 'user-5',
+    name: 'Charlie Brown',
+    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Charlie',
+    status: 'online',
+    statusMessage: 'Just chilling',
     isTyping: false
   }
 ];
 
 export const initialMessages: Message[] = [
   {
-    id: "msg-1",
-    userId: "user-2",
-    text: "Hey everyone! Who's working on the new project?",
-    timestamp: new Date(Date.now() - 360000),
+    id: 'msg-1',
+    userId: 'user-2',
+    receiverId: 'global',
+    text: 'Hey everyone, how are you doing today?',
+    timestamp: new Date('2023-05-01T09:00:00'),
     reactions: [
-      { emoji: "👍", count: 2, userIds: ["user-1", "user-5"] },
-      { emoji: "🎉", count: 1, userIds: ["user-3"] }
+      { emoji: '👍', count: 2, userIds: ['user-1', 'user-3'] },
+      { emoji: '❤️', count: 1, userIds: ['user-4'] }
     ]
   },
   {
-    id: "msg-2",
-    userId: "user-3",
-    text: "I'm on it! Been working on the database schema.",
-    timestamp: new Date(Date.now() - 300000),
+    id: 'msg-2',
+    userId: 'user-1',
+    receiverId: 'global',
+    text: "I'm doing great! Just finished a big project.",
+    timestamp: new Date('2023-05-01T09:05:00'),
     reactions: []
   },
   {
-    id: "msg-3",
-    userId: "user-1",
-    text: "I'll be handling the front-end components.",
-    timestamp: new Date(Date.now() - 240000),
+    id: 'msg-3',
+    userId: 'user-3',
+    receiverId: 'global',
+    text: 'Congrats on finishing your project!',
+    timestamp: new Date('2023-05-01T09:10:00'),
     reactions: [
-      { emoji: "🚀", count: 3, userIds: ["user-2", "user-3", "user-5"] }
+      { emoji: '🎉', count: 3, userIds: ['user-1', 'user-2', 'user-4'] }
     ]
   },
+  // Direct messages between user-1 and user-2
   {
-    id: "msg-4",
-    userId: "user-5",
-    text: "Great! I'll focus on the API integration then.",
-    timestamp: new Date(Date.now() - 180000),
+    id: 'dm-1',
+    userId: 'user-2',
+    receiverId: 'user-1',
+    text: 'Hey, can you help me with something?',
+    timestamp: new Date('2023-05-01T10:00:00'),
     reactions: []
   },
   {
-    id: "msg-5",
-    userId: "user-4",
-    text: "Sorry I'm late to the conversation. I can help with testing once you all have something ready.",
-    timestamp: new Date(Date.now() - 120000),
-    reactions: [
-      { emoji: "👌", count: 2, userIds: ["user-1", "user-2"] }
-    ]
+    id: 'dm-2',
+    userId: 'user-1',
+    receiverId: 'user-2',
+    text: 'Sure, what do you need?',
+    timestamp: new Date('2023-05-01T10:05:00'),
+    reactions: []
+  },
+  // Direct messages between user-1 and user-3
+  {
+    id: 'dm-3',
+    userId: 'user-3',
+    receiverId: 'user-1',
+    text: 'Are we still meeting tomorrow?',
+    timestamp: new Date('2023-05-01T11:00:00'),
+    reactions: []
+  },
+  {
+    id: 'dm-4',
+    userId: 'user-1',
+    receiverId: 'user-3',
+    text: 'Yes, 2 PM works for me.',
+    timestamp: new Date('2023-05-01T11:05:00'),
+    reactions: []
   }
-];
-
-export const availableReactions = [
-  "👍", "❤️", "🎉", "🚀", "👏", "😂", "🔥", "✅", "👌", "😍"
-];
-
-export const statusOptions = [
-  { value: "online", label: "Available", emoji: "🟢" },
-  { value: "busy", label: "Busy", emoji: "🔴" },
-  { value: "away", label: "Away", emoji: "🟡" },
-  { value: "offline", label: "Offline", emoji: "⚪" }
 ];

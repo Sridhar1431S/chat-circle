@@ -6,10 +6,13 @@ interface ChatContextType {
   currentUser: User | null;
   users: User[];
   messages: Message[];
+  activeChat: string | null;
+  setActiveChat: (userId: string | null) => void;
   sendMessage: (text: string) => void;
   setTyping: (isTyping: boolean) => void;
   addReaction: (messageId: string, emoji: string) => void;
   setUserStatus: (status: 'online' | 'busy' | 'away' | 'offline', statusMessage: string) => void;
+  getMessagesForChat: (userId: string | null) => Message[];
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -18,6 +21,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [activeChat, setActiveChat] = useState<string | null>(null);
 
   useEffect(() => {
     // Set the current user on mount
@@ -27,12 +31,21 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  const getMessagesForChat = (userId: string | null) => {
+    if (!userId) return messages;
+    return messages.filter(m => 
+      (m.userId === currentUser?.id && m.receiverId === userId) || 
+      (m.userId === userId && m.receiverId === currentUser?.id)
+    );
+  };
+
   const sendMessage = (text: string) => {
     if (!currentUser || !text.trim()) return;
 
     const newMessage: Message = {
       id: `msg-${Date.now()}`,
       userId: currentUser.id,
+      receiverId: activeChat || 'global',
       text: text.trim(),
       timestamp: new Date(),
       reactions: []
@@ -140,10 +153,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         currentUser,
         users,
         messages,
+        activeChat,
+        setActiveChat,
         sendMessage,
         setTyping,
         addReaction,
-        setUserStatus
+        setUserStatus,
+        getMessagesForChat
       }}
     >
       {children}

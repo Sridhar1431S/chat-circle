@@ -121,11 +121,89 @@
     @apply bg-yellow-500;
   }
   
-  .emoji-reaction {
-    @apply inline-flex items-center justify-center px-2 py-1 text-xs rounded-full bg-secondary hover:bg-secondary/80 transition-colors cursor-pointer;
+  /* Neon and heart animations */
+  .neon-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
   }
   
-  .emoji-reaction-active {
-    @apply bg-blue-100 text-blue-700;
+  .neon-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.15;
+    animation: neon-pulse 6s infinite alternate;
+  }
+  
+  .neon-glow:nth-child(1) {
+    background: #ff61ab;
+    width: 300px;
+    height: 300px;
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+  }
+  
+  .neon-glow:nth-child(2) {
+    background: #61a8ff;
+    width: 250px;
+    height: 250px;
+    top: 60%;
+    right: 15%;
+    animation-delay: 2s;
+  }
+  
+  .neon-glow:nth-child(3) {
+    background: #a161ff;
+    width: 200px;
+    height: 200px;
+    bottom: 10%;
+    left: 25%;
+    animation-delay: 4s;
+  }
+  
+  .floating-heart {
+    position: absolute;
+    color: rgba(255, 105, 180, 0.3);
+    font-size: 24px;
+    pointer-events: none;
+    animation: float-up 15s linear infinite;
+  }
+  
+  @keyframes neon-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.1;
+    }
+    50% {
+      opacity: 0.15;
+    }
+    100% {
+      transform: scale(1.2);
+      opacity: 0.1;
+    }
+  }
+  
+  @keyframes float-up {
+    0% {
+      transform: translateY(100vh) rotate(0deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.3;
+    }
+    90% {
+      opacity: 0.2;
+    }
+    100% {
+      transform: translateY(-100px) rotate(360deg);
+      opacity: 0;
+    }
   }
 }

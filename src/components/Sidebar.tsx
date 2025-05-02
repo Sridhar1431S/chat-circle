@@ -4,7 +4,7 @@ import { useChatContext } from '../context/ChatContext';
 import { UserStatus } from './UserStatus';
 
 export const Sidebar: React.FC = () => {
-  const { users, currentUser } = useChatContext();
+  const { users, currentUser, activeChat, setActiveChat } = useChatContext();
 
   // Get all online users except the current user
   const onlineUsers = users.filter(user => 
@@ -22,6 +22,10 @@ export const Sidebar: React.FC = () => {
       default:
         return 'bg-gray-300';
     }
+  };
+
+  const handleUserClick = (userId: string) => {
+    setActiveChat(userId === activeChat ? null : userId);
   };
 
   return (
@@ -55,9 +59,10 @@ export const Sidebar: React.FC = () => {
         
         <div className="space-y-1">
           {onlineUsers.map((user) => (
-            <div 
+            <button 
               key={user.id}
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-secondary transition-colors"
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-secondary transition-colors text-left ${activeChat === user.id ? 'bg-secondary/80' : ''}`}
+              onClick={() => handleUserClick(user.id)}
             >
               <div className="relative">
                 <img 
@@ -73,7 +78,7 @@ export const Sidebar: React.FC = () => {
                   {user.statusMessage}
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>
