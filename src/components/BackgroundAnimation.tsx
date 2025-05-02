@@ -1,14 +1,20 @@
 
 import React, { useEffect, useState } from 'react';
+import { useIsMobile } from '../hooks/use-mobile';
 
-interface HeartProps {
+interface ParticleProps {
   id: number;
 }
 
-const Heart: React.FC<HeartProps> = ({ id }) => {
+const HeartParticle: React.FC<ParticleProps> = ({ id }) => {
   const randomLeft = React.useMemo(() => Math.random() * 100, []);
   const randomDelay = React.useMemo(() => Math.random() * 15, []);
-  const randomSize = React.useMemo(() => Math.random() * 0.5 + 0.5, []);
+  const randomSize = React.useMemo(() => Math.random() * 0.5 + 0.25, []); // Smaller size range
+  const randomDuration = React.useMemo(() => Math.random() * 10 + 10, []); // Varied duration
+  const randomOpacity = React.useMemo(() => Math.random() * 0.2 + 0.1, []); // Lower opacity
+  
+  const heartEmojis = ['❤️', '💕', '💘', '💓', '💗', '💖', '💞', '💝'];
+  const emoji = React.useMemo(() => heartEmojis[id % heartEmojis.length], [id]);
   
   return (
     <div 
@@ -16,42 +22,50 @@ const Heart: React.FC<HeartProps> = ({ id }) => {
       style={{
         left: `${randomLeft}%`,
         animationDelay: `${randomDelay}s`,
-        fontSize: `${24 * randomSize}px`
+        animationDuration: `${randomDuration}s`,
+        fontSize: `${16 * randomSize}px`, // Smaller base size
+        opacity: randomOpacity
       }}
     >
-      {id % 3 === 0 ? '❤️' : id % 3 === 1 ? '💕' : '💘'}
+      {emoji}
     </div>
   );
 };
 
 export const BackgroundAnimation: React.FC = () => {
-  const [hearts, setHearts] = useState<number[]>([]);
+  const [particles, setParticles] = useState<number[]>([]);
+  const isMobile = useIsMobile();
   
   useEffect(() => {
-    // Create 15 hearts
-    setHearts(Array.from({ length: 15 }, (_, i) => i));
+    // Create initial particles - fewer on mobile
+    const initialCount = isMobile ? 10 : 20;
+    setParticles(Array.from({ length: initialCount }, (_, i) => i));
     
-    // Add new hearts periodically
+    // Add new particles periodically
     const interval = setInterval(() => {
-      setHearts(prev => {
-        const newHeartId = prev.length > 0 ? Math.max(...prev) + 1 : 0;
-        return [...prev, newHeartId];
+      setParticles(prev => {
+        // Cap the maximum number of particles
+        if (prev.length > (isMobile ? 15 : 30)) {
+          return [...prev.slice(1), prev[prev.length - 1] + 1];
+        }
+        const newParticleId = prev.length > 0 ? Math.max(...prev) + 1 : 0;
+        return [...prev, newParticleId];
       });
-    }, 3000);
+    }, isMobile ? 4000 : 3000); // Slower generation on mobile
     
     return () => clearInterval(interval);
-  }, []);
+  }, [isMobile]);
   
   return (
     <div className="neon-background">
-      {/* Neon glows */}
-      <div className="neon-glow"></div>
-      <div className="neon-glow"></div>
-      <div className="neon-glow"></div>
+      {/* Neon glows - responsive sizing */}
+      <div className={`neon-glow ${isMobile ? 'neon-glow-mobile' : ''}`}></div>
+      <div className={`neon-glow ${isMobile ? 'neon-glow-mobile' : ''}`}></div>
+      <div className={`neon-glow ${isMobile ? 'neon-glow-mobile' : ''}`}></div>
       
-      {/* Hearts */}
-      {hearts.map(id => (
-        <Heart key={id} id={id} />
+      {/* Heart particles */}
+      {particles.map(id => (
+        <HeartParticle key={id} id={id} />
       ))}
     </div>
   );
