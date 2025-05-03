@@ -26,7 +26,7 @@ export const MessageList: React.FC<MessageListProps> = ({ onBackClick }) => {
 
   // Find users who are typing (excluding the current user)
   const typingUsers = users
-    .filter(user => user.isTyping && user.id !== currentUser?.id)
+    .filter(user => user.isTyping && user.id !== currentUser?.id && (activeChat ? user.id === activeChat : false))
     .map(user => user.name);
   
   // Get the active chat user for header display
@@ -126,13 +126,16 @@ export const MessageList: React.FC<MessageListProps> = ({ onBackClick }) => {
           
           <div className="flex-1">
             <h2 className="font-medium">{activeChatUser.name}</h2>
-            <p className="text-xs text-muted-foreground">{
-              activeChatUser.status === 'online' 
-                ? 'Online' 
-                : activeChatUser.status === 'busy'
-                  ? 'Busy'
-                  : 'Away'
-            }</p>
+            <p className="text-xs text-muted-foreground">
+              {typingUsers.length > 0 
+                ? `Typing...` 
+                : activeChatUser.status === 'online' 
+                  ? 'Online' 
+                  : activeChatUser.status === 'busy'
+                    ? 'Busy'
+                    : 'Away'
+              }
+            </p>
           </div>
         </div>
       ) : (
