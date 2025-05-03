@@ -173,10 +173,90 @@
     }
   }
   
+  /* Neon lights background */
+  .neon-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.05);
+  }
+  
+  .neon-light {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.5;
+  }
+  
+  .neon-light-1 {
+    top: 25%;
+    left: 25%;
+    width: 200px;
+    height: 200px;
+    background-color: #9b87f5;
+    animation: neon-float 20s ease-in-out infinite;
+  }
+  
+  .neon-light-2 {
+    top: 60%;
+    left: 60%;
+    width: 250px;
+    height: 250px;
+    background-color: #D946EF;
+    animation: neon-float 25s ease-in-out infinite reverse;
+  }
+  
+  .neon-light-3 {
+    top: 15%;
+    right: 20%;
+    width: 180px;
+    height: 180px;
+    background-color: #8B5CF6;
+    animation: neon-float 18s ease-in-out infinite;
+  }
+  
+  .neon-light-4 {
+    bottom: 10%;
+    left: 30%;
+    width: 220px;
+    height: 220px;
+    background-color: #1EAEDB;
+    animation: neon-float 22s ease-in-out infinite reverse;
+  }
+  
+  @keyframes neon-float {
+    0%, 100% {
+      transform: translateY(0) translateX(0);
+    }
+    25% {
+      transform: translateY(-30px) translateX(20px);
+    }
+    50% {
+      transform: translateY(0) translateX(40px);
+    }
+    75% {
+      transform: translateY(30px) translateX(20px);
+    }
+  }
+  
   @media (max-width: 768px) {
     .floating-heart {
       font-size: 16px;
     }
+    
+    .neon-light-1, .neon-light-3 {
+      width: 120px;
+      height: 120px;
+    }
+    
+    .neon-light-2, .neon-light-4 {
+      width: 150px;
+      height: 150px;
+    }
   }
 }
-

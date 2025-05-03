@@ -31,7 +31,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onChatSelect }) => {
   };
 
   const handleUserClick = (userId: string) => {
-    setActiveChat(userId === activeChat ? null : userId);
+    // Always set the active chat when clicking a user
+    setActiveChat(userId);
+    
+    // Call the onChatSelect callback if provided (for mobile view)
     if (onChatSelect) {
       onChatSelect();
     }
