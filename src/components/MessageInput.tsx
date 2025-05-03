@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useChatContext } from '../context/ChatContext';
 import { Send, Smile } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -9,12 +8,19 @@ import { Button } from './ui/button';
 export const MessageInput: React.FC = () => {
   const [messageText, setMessageText] = useState('');
   const { activeChat, sendMessage, setTyping } = useChatContext();
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
-
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   // Reset message text when changing chats
   useEffect(() => {
     setMessageText('');
     setTyping(false);
+    
+    // Clean up any existing timeout when component unmounts or chat changes
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
   }, [activeChat, setTyping]);
 
   // Handle typing indicator with debounce
@@ -22,23 +28,20 @@ export const MessageInput: React.FC = () => {
     setMessageText(text);
     
     // Indicate typing has started
-    if (text.length > 0) {
+    if (text.length > 0 && !typingTimeoutRef.current) {
       setTyping(true);
     }
-
+    
     // Clear any existing timeout
-    if (typingTimeout) {
-      clearTimeout(typingTimeout);
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
     }
-
-    // Set a new timeout to clear typing indicator after 1.5 seconds of no typing
-    const newTimeout = setTimeout(() => {
-      if (text.length > 0) {
-        setTyping(false);
-      }
+    
+    // Set a new timeout to clear typing indicator after inactivity
+    typingTimeoutRef.current = setTimeout(() => {
+      setTyping(false);
+      typingTimeoutRef.current = null;
     }, 1500);
-
-    setTypingTimeout(newTimeout);
   };
 
   const handleSendMessage = (e?: React.FormEvent) => {
@@ -50,8 +53,10 @@ export const MessageInput: React.FC = () => {
       sendMessage(messageText);
       setMessageText('');
       setTyping(false);
-      if (typingTimeout) {
-        clearTimeout(typingTimeout);
+      
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
       }
     }
   };
