@@ -57,12 +57,7 @@ export const BackgroundAnimation: React.FC = () => {
   }, [isMobile]);
   
   return (
-    <div className="neon-background">
-      {/* Neon glows - responsive sizing */}
-      <div className={`neon-glow ${isMobile ? 'neon-glow-mobile' : ''}`}></div>
-      <div className={`neon-glow ${isMobile ? 'neon-glow-mobile' : ''}`}></div>
-      <div className={`neon-glow ${isMobile ? 'neon-glow-mobile' : ''}`}></div>
-      
+    <div className="heart-particles-background">
       {/* Heart particles */}
       {particles.map(id => (
         <HeartParticle key={id} id={id} />
