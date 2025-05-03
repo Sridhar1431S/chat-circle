@@ -24,7 +24,7 @@ export const MessageList: React.FC<MessageListProps> = ({ onBackClick }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [displayMessages]);
 
-  // Find users who are typing (excluding the current user)
+  // Find user who is typing (excluding the current user)
   const typingUsers = users
     .filter(user => user.isTyping && user.id !== currentUser?.id && (activeChat ? user.id === activeChat : false))
     .map(user => user.name);
@@ -128,7 +128,7 @@ export const MessageList: React.FC<MessageListProps> = ({ onBackClick }) => {
             <h2 className="font-medium">{activeChatUser.name}</h2>
             <p className="text-xs text-muted-foreground">
               {typingUsers.length > 0 
-                ? `Typing...` 
+                ? `${activeChatUser.name} is typing...` 
                 : activeChatUser.status === 'online' 
                   ? 'Online' 
                   : activeChatUser.status === 'busy'
@@ -177,30 +177,35 @@ export const MessageList: React.FC<MessageListProps> = ({ onBackClick }) => {
             )}
             
             {/* Bot typing indicator */}
-            {isBotTyping && activeChat && (
+            {isBotTyping && activeChat && activeChatUser && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground ml-2 mt-2">
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={activeChatUser.avatar} alt={activeChatUser.name} />
+                  <AvatarFallback>{activeChatUser.name.slice(0, 2)}</AvatarFallback>
+                </Avatar>
                 <div className="typing-indicator">
                   <div className="typing-dot"></div>
                   <div className="typing-dot"></div>
                   <div className="typing-dot"></div>
                 </div>
-                <span>{activeChatUser?.name} is typing...</span>
+                <span>{activeChatUser.name} is typing...</span>
               </div>
             )}
             
             {/* Regular typing indicator */}
             {typingUsers.length > 0 && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground ml-2 mt-2">
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={activeChatUser?.avatar} alt={activeChatUser?.name} />
+                  <AvatarFallback>{activeChatUser?.name.slice(0, 2)}</AvatarFallback>
+                </Avatar>
                 <div className="typing-indicator">
                   <div className="typing-dot"></div>
                   <div className="typing-dot"></div>
                   <div className="typing-dot"></div>
                 </div>
                 <span>
-                  {typingUsers.length === 1 
-                    ? `${typingUsers[0]} is typing...`
-                    : `${typingUsers.join(', ')} are typing...`
-                  }
+                  {typingUsers.join(', ')} is typing...
                 </span>
               </div>
             )}
