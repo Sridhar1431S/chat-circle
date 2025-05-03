@@ -4,6 +4,7 @@ import { useChatContext } from '../context/ChatContext';
 import { Send, Smile } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { availableReactions } from '../data/mockData';
+import { Button } from './ui/button';
 
 export const MessageInput: React.FC = () => {
   const [messageText, setMessageText] = useState('');
@@ -40,8 +41,11 @@ export const MessageInput: React.FC = () => {
     setTypingTimeout(newTimeout);
   };
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendMessage = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    
     if (messageText.trim() && activeChat) {
       sendMessage(messageText);
       setMessageText('');
@@ -58,6 +62,14 @@ export const MessageInput: React.FC = () => {
     document.getElementById('message-input')?.focus();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Send on Enter (but not with Shift+Enter)
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
   return (
     <form 
       onSubmit={handleSendMessage} 
@@ -65,13 +77,15 @@ export const MessageInput: React.FC = () => {
     >
       <Popover>
         <PopoverTrigger asChild>
-          <button 
+          <Button 
             type="button" 
-            className="p-2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+            variant="ghost"
+            size="icon"
+            className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
             disabled={!activeChat}
           >
             <Smile size={20} />
-          </button>
+          </Button>
         </PopoverTrigger>
         <PopoverContent className="w-64 p-2" side="top" align="start">
           <div className="grid grid-cols-8 gap-1">
@@ -95,15 +109,18 @@ export const MessageInput: React.FC = () => {
         placeholder={activeChat ? "Type a message..." : "Select a chat to start messaging..."}
         value={messageText}
         onChange={(e) => handleTyping(e.target.value)}
+        onKeyDown={handleKeyDown}
         disabled={!activeChat}
+        autoComplete="off"
       />
-      <button 
+      <Button 
         type="submit"
-        className="p-2 bg-primary text-white rounded-full hover:bg-primary/90 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed" 
+        size="icon"
+        className="bg-primary text-white rounded-full hover:bg-primary/90 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed" 
         disabled={!activeChat || !messageText.trim()}
       >
         <Send size={20} />
-      </button>
+      </Button>
     </form>
   );
 };
