@@ -99,8 +99,8 @@ export const MessageList: React.FC<MessageListProps> = ({ onBackClick }) => {
         'Thanks for sharing that with me!',
         'That sounds fascinating.',
         'I appreciate you telling me about that.',
-        'I'd love to hear more about that.',
-        'That's really cool!',
+        'I\'d love to hear more about that.',
+        'That\'s really cool!',
       ];
       return genericResponses[Math.floor(Math.random() * genericResponses.length)];
     }
