@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useChatContext } from '../context/ChatContext';
 import { Send, Smile } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -9,26 +9,31 @@ export const MessageInput: React.FC = () => {
   const [messageText, setMessageText] = useState('');
   const { activeChat, sendMessage, setTyping } = useChatContext();
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isTypingRef = useRef(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   
   // Reset message text when changing chats
   useEffect(() => {
     setMessageText('');
     setTyping(false);
+    isTypingRef.current = false;
     
     // Clean up any existing timeout when component unmounts or chat changes
     return () => {
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
       }
     };
   }, [activeChat, setTyping]);
 
-  // Handle typing indicator with debounce
-  const handleTyping = (text: string) => {
+  // Stable typing handler using useCallback to prevent unnecessary re-creations
+  const handleTyping = useCallback((text: string) => {
     setMessageText(text);
     
-    // Indicate typing has started
-    if (text.length > 0 && !typingTimeoutRef.current) {
+    // Indicate typing has started (using ref to avoid excessive state updates)
+    if (text.length > 0 && !isTypingRef.current) {
+      isTypingRef.current = true;
       setTyping(true);
     }
     
@@ -39,12 +44,13 @@ export const MessageInput: React.FC = () => {
     
     // Set a new timeout to clear typing indicator after inactivity
     typingTimeoutRef.current = setTimeout(() => {
+      isTypingRef.current = false;
       setTyping(false);
       typingTimeoutRef.current = null;
     }, 1500);
-  };
+  }, [setTyping]);
 
-  const handleSendMessage = (e?: React.FormEvent) => {
+  const handleSendMessage = useCallback((e?: React.FormEvent) => {
     if (e) {
       e.preventDefault();
     }
@@ -52,6 +58,9 @@ export const MessageInput: React.FC = () => {
     if (messageText.trim() && activeChat) {
       sendMessage(messageText);
       setMessageText('');
+      
+      // Reset typing state
+      isTypingRef.current = false;
       setTyping(false);
       
       if (typingTimeoutRef.current) {
@@ -59,21 +68,26 @@ export const MessageInput: React.FC = () => {
         typingTimeoutRef.current = null;
       }
     }
-  };
+  }, [messageText, activeChat, sendMessage, setTyping]);
 
-  const handleEmojiSelect = (emoji: string) => {
+  const handleEmojiSelect = useCallback((emoji: string) => {
     setMessageText((current) => current + emoji);
     // Focus back on the input after selecting emoji
-    document.getElementById('message-input')?.focus();
-  };
+    inputRef.current?.focus();
+  }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     // Send on Enter (but not with Shift+Enter)
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
-  };
+  }, [handleSendMessage]);
+
+  // Stable input change handler
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    handleTyping(e.target.value);
+  }, [handleTyping]);
 
   return (
     <form 
@@ -109,14 +123,16 @@ export const MessageInput: React.FC = () => {
       </Popover>
       
       <input
+        ref={inputRef}
         id="message-input"
         className="flex-1 py-2 px-4 bg-secondary rounded-full focus:outline-none focus:ring-1 focus:ring-primary"
         placeholder={activeChat ? "Type a message..." : "Select a chat to start messaging..."}
         value={messageText}
-        onChange={(e) => handleTyping(e.target.value)}
+        onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         disabled={!activeChat}
         autoComplete="off"
+        style={{ transition: 'none' }} // Disable transitions that might cause blinking
       />
       <Button 
         type="submit"
