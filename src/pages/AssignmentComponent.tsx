@@ -4,13 +4,17 @@ import React, { useState, useRef, useEffect } from 'react';
 export default function AssignmentComponent() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<string[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleSend = () => {
-    const trimmed = input.trim();
-    if (trimmed.length === 0) return;
-    setMessages((prev) => [...prev, trimmed]);
+    const trimmedInput = input.trim();
+    if (trimmedInput.length === 0) return;
+    
+    setMessages((prev) => [...prev, trimmedInput]);
     setInput('');
+    setIsTyping(false);
     inputRef.current?.focus();
   };
 
@@ -20,7 +24,27 @@ export default function AssignmentComponent() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
+    
+    // Show typing indicator when user is typing
+    if (e.target.value.length > 0 && !isTyping) {
+      setIsTyping(true);
+    } else if (e.target.value.length === 0 && isTyping) {
+      setIsTyping(false);
+    }
   };
+
+  // Handle clear button
+  const handleClear = () => {
+    setMessages([]);
+    setInput('');
+    setIsTyping(false);
+    inputRef.current?.focus();
+  };
+
+  // Auto scroll to bottom when new message is added
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -59,7 +83,19 @@ export default function AssignmentComponent() {
             </div>
           ))
         )}
+        <div ref={messagesEndRef} />
       </div>
+
+      {/* Typing indicator */}
+      {isTyping && (
+        <div style={{ 
+          marginBottom: '0.5rem',
+          fontSize: '0.9rem',
+          color: '#555'
+        }}>
+          User is typing...
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: '0.5rem' }}>
         <input
@@ -79,17 +115,33 @@ export default function AssignmentComponent() {
         />
         <button
           onClick={handleSend}
+          disabled={input.trim().length === 0}
           style={{
             padding: '0.75rem 1rem',
-            backgroundColor: '#0070f3',
+            backgroundColor: input.trim().length === 0 ? '#cccccc' : '#0070f3',
             color: 'white',
             border: 'none',
             borderRadius: '5px',
-            cursor: 'pointer',
+            cursor: input.trim().length === 0 ? 'not-allowed' : 'pointer',
             fontSize: '1rem'
           }}
         >
           Send
+        </button>
+        <button
+          onClick={handleClear}
+          disabled={messages.length === 0}
+          style={{
+            padding: '0.75rem 1rem',
+            backgroundColor: messages.length === 0 ? '#cccccc' : '#ff4757',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: messages.length === 0 ? 'not-allowed' : 'pointer',
+            fontSize: '1rem'
+          }}
+        >
+          Clear
         </button>
       </div>
     </div>
