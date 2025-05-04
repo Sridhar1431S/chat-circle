@@ -18,6 +18,10 @@ export default function AssignmentComponent() {
     if (e.key === 'Enter') handleSend();
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -37,7 +41,9 @@ export default function AssignmentComponent() {
         padding: '1rem',
         minHeight: '200px',
         marginBottom: '1rem',
-        backgroundColor: '#f9f9f9'
+        backgroundColor: '#f9f9f9',
+        overflowY: 'auto',
+        maxHeight: '400px'
       }}>
         {messages.length === 0 ? (
           <p style={{ color: '#777' }}>No messages yet.</p>
@@ -60,7 +66,7 @@ export default function AssignmentComponent() {
           ref={inputRef}
           type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder="Type a message"
           style={{
