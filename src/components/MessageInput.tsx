@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useChatContext } from '../context/ChatContext';
 import { Send, Smile } from 'lucide-react';
@@ -13,14 +12,13 @@ export const MessageInput: React.FC = () => {
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isTypingRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  
-  // Reset message text when changing chats
+
   useEffect(() => {
+    console.log("Active chat:", activeChat); // 🔍 Debugging log
     setMessageText('');
     setTyping(false);
     isTypingRef.current = false;
-    
-    // Clean up any existing timeout when component unmounts or chat changes
+
     return () => {
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
@@ -29,22 +27,18 @@ export const MessageInput: React.FC = () => {
     };
   }, [activeChat, setTyping]);
 
-  // Stable typing handler using useCallback to prevent unnecessary re-creations
   const handleTyping = useCallback((text: string) => {
     setMessageText(text);
-    
-    // Indicate typing has started (using ref to avoid excessive state updates)
+
     if (text.length > 0 && !isTypingRef.current) {
       isTypingRef.current = true;
       setTyping(true);
     }
-    
-    // Clear any existing timeout
+
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-    
-    // Set a new timeout to clear typing indicator after inactivity
+
     typingTimeoutRef.current = setTimeout(() => {
       isTypingRef.current = false;
       setTyping(false);
@@ -53,37 +47,30 @@ export const MessageInput: React.FC = () => {
   }, [setTyping]);
 
   const handleSendMessage = useCallback((e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
-    
+    if (e) e.preventDefault();
+
     const trimmedMessage = messageText.trim();
-    if (trimmedMessage && activeChat) {
+    if (trimmedMessage /* && activeChat */) { // 🔧 removed activeChat check temporarily
       sendMessage(trimmedMessage);
       setMessageText('');
-      
-      // Reset typing state
       isTypingRef.current = false;
       setTyping(false);
-      
+
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
         typingTimeoutRef.current = null;
       }
-      
-      // Focus the input after sending
+
       inputRef.current?.focus();
     }
-  }, [messageText, activeChat, sendMessage, setTyping]);
+  }, [messageText, sendMessage, setTyping]);
 
   const handleEmojiSelect = useCallback((emoji: string) => {
     setMessageText((current) => current + emoji);
-    // Focus back on the input after selecting emoji
     inputRef.current?.focus();
   }, []);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Send on Enter (but not with Shift+Enter)
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -102,7 +89,7 @@ export const MessageInput: React.FC = () => {
             variant="ghost"
             size="icon"
             className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
-            disabled={!activeChat}
+            // disabled={!activeChat}
           >
             <Smile size={20} />
           </Button>
@@ -127,18 +114,18 @@ export const MessageInput: React.FC = () => {
         ref={inputRef}
         id="message-input"
         className="flex-1 py-2 px-4 bg-secondary rounded-full focus:outline-none focus:ring-1 focus:ring-primary"
-        placeholder={activeChat ? "Type a message..." : "Select a chat to start messaging..."}
+        placeholder={"Type a message..."}
         value={messageText}
         onChange={(e) => handleTyping(e.target.value)}
         onKeyDown={handleKeyDown}
-        disabled={!activeChat}
+        // disabled={!activeChat}
         autoComplete="off"
       />
       <Button 
         type="submit"
         size="icon"
         className="bg-primary text-white rounded-full hover:bg-primary/90 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed" 
-        disabled={!activeChat || !messageText.trim()}
+        disabled={!messageText.trim()} // activeChat check removed temporarily
       >
         <Send size={20} />
       </Button>
