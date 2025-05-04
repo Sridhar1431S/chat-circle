@@ -3,7 +3,7 @@ import React from 'react';
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useChatContext } from '../context/ChatContext';
-import { MessageInterface, User } from '../data/mockData';
+import { Message as MessageInterface, User } from '../data/mockData';
 
 interface MessageProps {
   message: MessageInterface;
