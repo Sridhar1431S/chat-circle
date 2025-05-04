@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useChatContext } from '../context/ChatContext';
 import { Send, Smile } from 'lucide-react';
@@ -14,7 +15,6 @@ export const MessageInput: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    console.log("Active chat:", activeChat); // 🔍 Debugging log
     setMessageText('');
     setTyping(false);
     isTypingRef.current = false;
@@ -47,24 +47,23 @@ export const MessageInput: React.FC = () => {
   }, [setTyping]);
 
   const handleSendMessage = useCallback((e?: React.FormEvent) => {
-  if (e) e.preventDefault();
+    if (e) e.preventDefault();
 
-  const trimmedMessage = messageText.trim();
-  if (trimmedMessage) {
-    sendMessage(trimmedMessage);
-    setMessageText('');  // Clear the input after sending
-    isTypingRef.current = false;
-    setTyping(false);
+    const trimmedMessage = messageText.trim();
+    if (trimmedMessage) {
+      sendMessage(trimmedMessage);
+      setMessageText('');
+      isTypingRef.current = false;
+      setTyping(false);
 
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-      typingTimeoutRef.current = null;
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+
+      inputRef.current?.focus();
     }
-
-    inputRef.current?.focus();  // Focus back on the input
-  }
-}, [messageText, sendMessage, setTyping]);
-
+  }, [messageText, sendMessage, setTyping]);
 
   const handleEmojiSelect = useCallback((emoji: string) => {
     setMessageText((current) => current + emoji);
@@ -90,7 +89,6 @@ export const MessageInput: React.FC = () => {
             variant="ghost"
             size="icon"
             className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
-            // disabled={!activeChat}
           >
             <Smile size={20} />
           </Button>
@@ -110,22 +108,21 @@ export const MessageInput: React.FC = () => {
           </div>
         </PopoverContent>
       </Popover>
-    <Input
-  ref={inputRef}
-  id="message-input"
-  className="flex-1 py-2 px-4 bg-secondary rounded-full focus:outline-none focus:ring-1 focus:ring-primary"
-  placeholder={"Type a message..."}
-  value={messageText}  // Bound to state
-  onChange={(e) => handleTyping(e.target.value)}  // Updates state as user types
-  onKeyDown={handleKeyDown}
-  autoComplete="off"
-/>
-
+      <Input
+        ref={inputRef}
+        id="message-input"
+        className="flex-1 py-2 px-4 bg-secondary rounded-full focus:outline-none focus:ring-1 focus:ring-primary"
+        placeholder="Type a message..."
+        value={messageText}
+        onChange={(e) => handleTyping(e.target.value)}
+        onKeyDown={handleKeyDown}
+        autoComplete="off"
+      />
       <Button 
         type="submit"
         size="icon"
         className="bg-primary text-white rounded-full hover:bg-primary/90 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed" 
-        disabled={!messageText.trim()} // activeChat check removed temporarily
+        disabled={!messageText.trim()}
       >
         <Send size={20} />
       </Button>

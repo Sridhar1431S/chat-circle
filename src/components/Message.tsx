@@ -3,11 +3,11 @@ import React from 'react';
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useChatContext } from '../context/ChatContext';
-import { Message as MessageInterface, User } from '../data/mockData';
+import { Message as MessageInterface } from '../data/mockData';
 
 interface MessageProps {
   message: MessageInterface;
-  sender: User;
+  sender: any; // Using 'any' to match the existing implementation
 }
 
 export const Message: React.FC<MessageProps> = ({ message, sender }) => {
