@@ -14,41 +14,56 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 355.7 100% 97.3%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 142 76% 36%;
 
     --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    /* ... keep existing code (dark mode variables) */
+    --background: 20 14.3% 4.1%;
+    --foreground: 0 0% 95%;
+
+    --card: 24 9.8% 10%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 142 70% 50%;
+    --primary-foreground: 144.9 80.4% 10%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 12 6.5% 15.1%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 142 76% 36%;
   }
 }
 
@@ -64,7 +79,7 @@
 
 @layer components {
   .message-bubble {
-    @apply py-2 px-3 rounded-lg max-w-[85%] break-words;
+    @apply py-2 px-3 rounded-lg max-w-full break-words;
   }
   
   .message-bubble-sent {
@@ -80,7 +95,7 @@
   }
   
   .typing-dot {
-    @apply w-2 h-2 rounded-full bg-muted-foreground;
+    @apply w-1.5 h-1.5 rounded-full bg-muted-foreground;
     animation: typing-bounce 1.4s infinite ease-in-out;
   }
   
@@ -101,7 +116,7 @@
       transform: translateY(0);
     }
     30% {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
     }
   }
   
@@ -121,8 +136,8 @@
     @apply bg-yellow-500;
   }
   
-  /* Neon and heart animations */
-  .neon-background {
+  /* Heart particles animations */
+  .heart-particles-background {
     position: fixed;
     top: 0;
     left: 0;
@@ -133,41 +148,6 @@
     overflow: hidden;
   }
   
-  .neon-glow {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(40px);
-    opacity: 0.15;
-    animation: neon-pulse 6s infinite alternate;
-  }
-  
-  .neon-glow:nth-child(1) {
-    background: #ff61ab;
-    width: 300px;
-    height: 300px;
-    top: 10%;
-    left: 10%;
-    animation-delay: 0s;
-  }
-  
-  .neon-glow:nth-child(2) {
-    background: #61a8ff;
-    width: 250px;
-    height: 250px;
-    top: 60%;
-    right: 15%;
-    animation-delay: 2s;
-  }
-  
-  .neon-glow:nth-child(3) {
-    background: #a161ff;
-    width: 200px;
-    height: 200px;
-    bottom: 10%;
-    left: 25%;
-    animation-delay: 4s;
-  }
-  
   .floating-heart {
     position: absolute;
     color: rgba(255, 105, 180, 0.3);
@@ -176,34 +156,27 @@
     animation: float-up 15s linear infinite;
   }
   
-  @keyframes neon-pulse {
-    0% {
-      transform: scale(1);
-      opacity: 0.1;
-    }
-    50% {
-      opacity: 0.15;
-    }
-    100% {
-      transform: scale(1.2);
-      opacity: 0.1;
-    }
-  }
-  
   @keyframes float-up {
     0% {
       transform: translateY(100vh) rotate(0deg);
       opacity: 0;
     }
     10% {
-      opacity: 0.3;
+      opacity: 1;
     }
-    90% {
-      opacity: 0.2;
+    80% {
+      opacity: 0.8;
     }
     100% {
       transform: translateY(-100px) rotate(360deg);
       opacity: 0;
     }
   }
+  
+  @media (max-width: 768px) {
+    .floating-heart {
+      font-size: 16px;
+    }
+  }
 }
+

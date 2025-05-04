@@ -26,16 +26,16 @@ export interface Message {
   reactions: MessageReaction[];
 }
 
-export const availableReactions = ['👍', '❤️', '😂', '😮', '😢', '🎉'];
-
-export const currentUserId = 'user-1';
-
 export const statusOptions = [
   { value: 'online', label: 'Online', emoji: '🟢' },
   { value: 'busy', label: 'Busy', emoji: '🔴' },
   { value: 'away', label: 'Away', emoji: '🟠' },
-  { value: 'offline', label: 'Offline', emoji: '⚫' }
+  { value: 'offline', label: 'Offline', emoji: '⚪' }
 ];
+
+export const availableReactions = ['👍', '❤️', '😂', '😮', '😢', '🎉'];
+
+export const currentUserId = 'user-1';
 
 export const initialUsers: User[] = [
   {
