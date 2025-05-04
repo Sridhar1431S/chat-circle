@@ -5,7 +5,6 @@ import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
 import { ChatProvider } from '../context/ChatContext';
 import { BackgroundAnimation } from './BackgroundAnimation';
-import { NeonBackground } from './NeonBackground';
 import { useIsMobile } from '../hooks/use-mobile';
 
 export const ChatApp: React.FC = () => {
@@ -16,9 +15,8 @@ export const ChatApp: React.FC = () => {
     <ChatProvider>
       <div className="flex flex-col h-screen bg-background">
         <div className="flex flex-1 overflow-hidden relative">
-          {/* Background effects */}
-          <div className="absolute inset-0 z-0 pointer-events-none">
-            <NeonBackground />
+          {/* Background only shows when in a chat */}
+          <div className="absolute inset-0 z-0">
             <BackgroundAnimation />
           </div>
           
