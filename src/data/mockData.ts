@@ -30,6 +30,14 @@ export const availableReactions = ['👍', '❤️', '😂', '😮', '😢', '�
 
 export const currentUserId = 'user-1';
 
+// Add the missing statusOptions export
+export const statusOptions = [
+  { value: 'online', label: 'Online', emoji: '🟢' },
+  { value: 'busy', label: 'Busy', emoji: '🔴' },
+  { value: 'away', label: 'Away', emoji: '🟠' },
+  { value: 'offline', label: 'Offline', emoji: '⚪' }
+];
+
 export const initialUsers: User[] = [
   {
     id: 'user-1',
