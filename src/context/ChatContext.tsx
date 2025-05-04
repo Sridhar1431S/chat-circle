@@ -8,7 +8,7 @@ interface ChatContextType {
   messages: Message[];
   activeChat: string | null;
   setActiveChat: (userId: string | null) => void;
-  sendMessage: (text: string, receiverId?: string, isBot?: boolean) => void;
+  sendMessage: (text: string) => void;
   setTyping: (isTyping: boolean) => void;
   addReaction: (messageId: string, emoji: string) => void;
   setUserStatus: (status: 'online' | 'busy' | 'away' | 'offline', statusMessage: string) => void;
@@ -32,25 +32,20 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const getMessagesForChat = (userId: string | null) => {
-    if (!userId) return [];
+    if (!userId) return messages;
     return messages.filter(m => 
       (m.userId === currentUser?.id && m.receiverId === userId) || 
       (m.userId === userId && m.receiverId === currentUser?.id)
     );
   };
 
-  const sendMessage = (text: string, receiverId?: string, isBot?: boolean) => {
-    if (!text.trim()) return;
-    
-    const sender = isBot ? activeChat : currentUser?.id;
-    const receiver = isBot ? currentUser?.id : (receiverId || activeChat);
-    
-    if (!sender || !receiver) return;
+  const sendMessage = (text: string) => {
+    if (!currentUser || !text.trim()) return;
 
     const newMessage: Message = {
       id: `msg-${Date.now()}`,
-      userId: sender,
-      receiverId: receiver,
+      userId: currentUser.id,
+      receiverId: activeChat || 'global',
       text: text.trim(),
       timestamp: new Date(),
       reactions: []
@@ -59,9 +54,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setMessages(prev => [...prev, newMessage]);
     
     // Reset typing indicator after sending message
-    if (!isBot) {
-      setTyping(false);
-    }
+    setTyping(false);
   };
 
   const setTyping = (isTyping: boolean) => {

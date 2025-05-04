@@ -1,106 +1,85 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useChatContext } from '../context/ChatContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Send, Smile } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { availableReactions } from '../data/mockData';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
 
 export const MessageInput: React.FC = () => {
-  const [messageText, setMessageText] = useState('');
-  const { activeChat, sendMessage, setTyping } = useChatContext();
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const isTypingRef = useRef(false);
+  const { sendMessage, setTyping } = useChatContext();
+  const [message, setMessage] = useState('');
+  const [typingTimeout, setTypingTimeoutRef] = useState<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
+  
+  // Handle typing indicator
   useEffect(() => {
-    setMessageText('');
-    setTyping(false);
-    isTypingRef.current = false;
-
+    if (message && message.length > 0) {
+      setTyping(true);
+      
+      // Clear any existing timeout
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+      }
+      
+      // Set a new timeout
+      const timeout = setTimeout(() => {
+        setTyping(false);
+      }, 3000); // Stop typing indicator after 3 seconds of inactivity
+      
+      setTypingTimeoutRef(timeout);
+    } else {
+      setTyping(false);
+      
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+      }
+    }
+    
+    // Cleanup
     return () => {
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-        typingTimeoutRef.current = null;
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
       }
     };
-  }, [activeChat, setTyping]);
+  }, [message, setTyping]);
 
-  const handleTyping = useCallback((text: string) => {
-    setMessageText(text);
-
-    if (text.length > 0 && !isTypingRef.current) {
-      isTypingRef.current = true;
-      setTyping(true);
-    }
-
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-
-    typingTimeoutRef.current = setTimeout(() => {
-      isTypingRef.current = false;
-      setTyping(false);
-      typingTimeoutRef.current = null;
-    }, 1500);
-  }, [setTyping]);
-
-  const handleSendMessage = useCallback((e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-
-    const trimmedMessage = messageText.trim();
-    if (trimmedMessage) {
-      sendMessage(trimmedMessage);
-      setMessageText('');
-      isTypingRef.current = false;
-      setTyping(false);
-
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-        typingTimeoutRef.current = null;
-      }
-
+  const handleSendMessage = () => {
+    if (message.trim()) {
+      sendMessage(message);
+      setMessage('');
       inputRef.current?.focus();
     }
-  }, [messageText, sendMessage, setTyping]);
+  };
 
-  const handleEmojiSelect = useCallback((emoji: string) => {
-    setMessageText((current) => current + emoji);
-    inputRef.current?.focus();
-  }, []);
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
-  }, [handleSendMessage]);
+  };
+
+  const insertEmoji = (emoji: string) => {
+    setMessage(prev => prev + emoji);
+    inputRef.current?.focus();
+  };
 
   return (
-    <form 
-      onSubmit={handleSendMessage} 
-      className="border-t p-2 flex items-center gap-2 bg-background/80 backdrop-blur-sm"
-    >
+    <div className="flex items-center gap-2 p-4 border-t">
       <Popover>
         <PopoverTrigger asChild>
-          <Button 
-            type="button" 
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
-          >
-            <Smile size={20} />
+          <Button variant="ghost" size="icon" className="flex-shrink-0">
+            <Smile className="h-5 w-5" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-64 p-2" side="top" align="start">
-          <div className="grid grid-cols-8 gap-1">
+        <PopoverContent className="w-64 p-2" align="start">
+          <div className="grid grid-cols-5 gap-2">
             {availableReactions.map((emoji) => (
               <button
                 key={emoji}
-                onClick={() => handleEmojiSelect(emoji)}
-                className="p-1.5 hover:bg-secondary rounded-sm transition-colors"
-                type="button"
+                className="p-2 text-xl hover:bg-secondary rounded-md transition-colors"
+                onClick={() => insertEmoji(emoji)}
               >
                 {emoji}
               </button>
@@ -108,24 +87,24 @@ export const MessageInput: React.FC = () => {
           </div>
         </PopoverContent>
       </Popover>
+      
       <Input
         ref={inputRef}
-        id="message-input"
-        className="flex-1 py-2 px-4 bg-secondary rounded-full focus:outline-none focus:ring-1 focus:ring-primary"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={handleKeyPress}
         placeholder="Type a message..."
-        value={messageText}
-        onChange={(e) => handleTyping(e.target.value)}
-        onKeyDown={handleKeyDown}
-        autoComplete="off"
+        className="rounded-full"
       />
+      
       <Button 
-        type="submit"
+        onClick={handleSendMessage} 
         size="icon"
-        className="bg-primary text-white rounded-full hover:bg-primary/90 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed" 
-        disabled={!messageText.trim()}
+        className="rounded-full flex-shrink-0" 
+        disabled={!message.trim()}
       >
-        <Send size={20} />
+        <Send className="h-5 w-5" />
       </Button>
-    </form>
+    </div>
   );
 };
